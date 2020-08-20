@@ -1,22 +1,46 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import axios from 'axios';
 
-function Hi()
-{
-	return <div>Hello World!</div>
+import './index.css';
+/*import App from './App';*/
+function Reddit() {
+  const [posts, setPosts] = useState([]);
+  
+  React.useEffect(() => {
+  axios.get(`https://www.reddit.com/r/reactjs.json`)
+    .then(res => {
+      const newPosts = res.data.data.children
+        .map(obj => obj.data);
+
+      setPosts(newPosts);
+    });
+}, []);
+
+  function handleClick(e) {
+    e.preventDefault();
+    console.log('The link was clicked.');
+  }
+  return (
+    <div>
+      <h1>/r/reactjs</h1>
+	  <ul>
+        {posts.map(post => (
+		  <div key={post.id}>
+          <li>
+		  <a href={post.url} onClick={handleClick}>
+		  {post.title}
+		  </a>
+		  </li>
+		  
+		  <li>{post.score}</li>
+		  <li>{post.author_fullname}</li>
+		  <br/>
+		  </div>
+        ))}
+      </ul>
+    </div>
+  );
 }
 
-ReactDOM.render(
-  <React.StrictMode>
-    <Hi />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
-
-// If you want your app to work offline and load faster, you can change
-// unregister() to register() below. Note this comes with some pitfalls.
-// Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+ReactDOM.render(<Reddit />, document.getElementById("root"));
